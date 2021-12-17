@@ -22,22 +22,21 @@
 #' @note outpath: pathway of output file.
 #' @note outfile: output file name.
 #' @author Benxia Hu
+#' @return One file will be returned at default.
+#' @import utils
 #' @import data.table
-#' @import ggplot2
 #' @import tidyr
 #' @import GenomicFeatures
 #' @import dplyr
-#' @import BiocGenerics
 #' @import stats
-#' @import IRanges
-#' @import GenomeInfoDb
 #' @import GenomicRanges
 #' @import writexl
 #' @examples
 #' # run the function
 #' # peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
 #' @export
-
+"peakAnno"
+options(warn=-1)
 peakAnno <- function(GTF=GTF,organism=organism,up=2000,down=0,peaktype='m6A',bedfile,outpath,outfile="m6A_anno") {
     print("make an annotation file containing transcriptid,gene symbol and gene type.")
     #gtf="/data/bxhu/project/database/hg38/gencode.v38.annotation.gtf"
