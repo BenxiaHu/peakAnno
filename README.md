@@ -6,6 +6,6 @@
 devtools::install_github("https://github.com/BioEpi/peakAnno")
 
 ###usage:  
-peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
-GTF: GTF files are available from https://www.gencodegenes.org/. 
+peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)  
+GTF: GTF files are available from https://www.gencodegenes.org/.  
 
