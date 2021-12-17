@@ -13,7 +13,7 @@ peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
 **up**: the distance to the upstream of transcription start sites. default value is 2000.    
 **down**: the distance to the downstream of transcription start sites. default value is 0.  
 **peaktype**: what kind of sequencing data are used to call peaks.  default value is 'm6A'.  
-**bedfile**: the name of peaks. The bed file must includes chromosome, start, end and strand (+/-/.). It is better to provide the absolute path of the file.  
+**bedfile**: the name of peaks. The bed file includes chromosome, start, end and strand (+/-/.). It is better to provide the absolute path of the file.  
 | chr | start | end | strand |
 | :------: |:------: |:------: |:------: |
 | chr1 | 1000 | 1200 | + |
