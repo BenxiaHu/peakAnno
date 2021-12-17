@@ -27,6 +27,8 @@ peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
 **outfile**: the file name is used to save the results.   
 
 ### note:  
-1.  Here the entire genome is separated to gene promoter/5'UTR/CDS/exon/intron/3'UTR. protein-coding genes have the following features: gene promoter/5'UTR/CDS/intron/3'UTR, while non-coding genes have the following features: gene promoter/5'UTR/exon/intron/3'UTR.  
-2.  If your peak file is generated from ATAC-seq/ChIP-seq/Cut&Tag, peaks may be located in protein-coding genes have the following features: gene  promoter/5'UTR/CDS/intron/3'UTR, while non-coding genes have the following features: gene promoter/5'UTR/exon/intron/3'UTR. 
-3.  If your peak file is generated from MeRIP-seq, peaks may be located in protein-coding genes have the following features: gene promoter/5'UTR/CDS/3'UTR, while non-coding genes have the following features: gene promoter/5'UTR/exon/3'UTR. 
+1.  Here the entire genome is separated to gene promoter/5'UTR/CDS/exon/intron/3'UTR. 
+2.  protein-coding genes have the following features: gene promoter/5'UTR/CDS/intron/3'UTR.
+3.  non-coding genes have the following features: gene promoter/5'UTR/exon/intron/3'UTR.  
+4.  If your peak file is generated from ATAC-seq/ChIP-seq/Cut&Tag and peaks may be assigned to protein-coding genes, these peaks may be located in: gene  promoter/5'UTR/CDS/intron/3'UTR. If peaks may be assigned to  non-coding genes, these peaks may be located in: gene promoter/5'UTR/exon/intron/3'UTR. 
+6.  If your peak file is generated from MeRIP-seq, and peaks may be assigned to protein-coding genes, these peaks may be located in: gene promoter/5'UTR/CDS/3'UTR, If peaks may be assigned to  non-coding genes, these peaks may be located in: gene promoter/5'UTR/exon/3'UTR. 
