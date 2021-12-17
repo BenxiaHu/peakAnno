@@ -22,5 +22,6 @@ peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
 | chr1 | 2800 | 3200 | + |
 | chr1 | 5000 | 5150 | + |
 | chr1 | 6000 | 6350 | + |  
+
 **outpath**: the path is used to save the results.  
 **outfile**: the file name is used to save the results.  
