@@ -26,41 +26,35 @@
 "peakAnno"
 options(warn=-1)
 peakAnno <- function(GTF=GTF,organism=organism,up=2000,down=0,peaktype='m6A',bedfile,outpath,outfile="m6A_anno") {
-  
-    # 对参数进行处理，判断参数是否有效，并给出相应的信息
-    message("make an annotation file containing transcriptid,gene symbol and gene type.") # 使用 message() 来显示进度
-    #gtf="/data/bxhu/project/database/hg38/gencode.v38.annotation.gtf"  # 删掉这些无用的代码
+    message("make an annotation file containing transcriptid,gene symbol and gene type.")
     gtf <- as.character(GTF)
-    GTF <- data.table::fread(gtf,sep="\t",header=F) # 软件包中函数的引用要使用完整（绝对）的函数路径
+    GTF <- data.table::fread(gtf,sep="\t",header=F)
     GTF <- GTF[GTF$V3 == 'transcript',]
     df <- data.frame(V9=GTF[,9])
-    hg38_anno <- df %>% tidyr::separate(V9, c(NA,"transcript_id","gene_type","gene_name",NA,NA,NA,NA,NA,NA,NA,NA),sep=";") # 既然你还支持其它的物种，那变量名称需要改一下。
-    df <- data.frame(X=hg38_anno[,3])
-    temp <- df %>% separate("X", c("A","gene_name"),sep='\\"') # 不允许出现可被解释为变量的字符
-    hg38_anno$gene_name <- temp[,2]
-    df <- data.frame(X=hg38_anno[,2])
-    temp <- df %>% separate(X, c("A","gene_type"),sep='\\"')
-    hg38_anno$gene_type <- temp[,2]
-    df <- data.frame(X=hg38_anno[,1])
-    temp <- df %>% separate(X, c("A","transcript_id"),sep='\\"')
-    hg38_anno$transcript_id <- temp[,2]
+    gene_anno <- df %>% tidyr::separate("V9", c(NA,"transcript_id","gene_type","gene_name",NA,NA,NA,NA,NA,NA,NA,NA),sep=";")
+    df <- data.frame(geneinfo=gene_anno[,3])
+    temp <- df %>% separate("geneinfo", c("A","gene_name"),sep='\\"')
+    gene_anno$gene_name <- temp[,2]
+    df <- data.frame(geneinfo=gene_anno[,2])
+    temp <- df %>% separate("geneinfo", c("A","gene_type"),sep='\\"')
+    gene_anno$gene_type <- temp[,2]
+    df <- data.frame(geneinfo=gene_anno[,1])
+    temp <- df %>% separate("geneinfo", c("A","transcript_id"),sep='\\"')
+    gene_anno$transcript_id <- temp[,2]
 
-    #save(file="/data/bxhu/project/database/hg38/hg38_anno.Rdata",hg38_anno)
-
-    print("make an annotation file")
+    message("make an annotation file")
     txdb <- makeTxDbFromGFF(gtf, organism = organism, format = "gtf")
 
-    print("define promoter regions")
+    message("define promoter regions")
     PR <- promoters(txdb, upstream=as.numeric(up), downstream=as.numeric(down))
     names(PR) <- NULL
     PR <- as.data.frame(PR)[,c(1:3,5,7)]
-    PR$type <- 'promoter'
+    PR$typeid <- 'promoter'
 
     genomicFeature <- PR
     getfeature <- function(txdbid,featureid){
         if(featureid == 'exon'){
             getresult <- as.data.frame(exonsBy(txdbid, by = "tx",use.names=TRUE))[,c(3:5,7,2)]
-        #print(head(getresult))
         }else if(featureid == 'intron'){
             getresult <- as.data.frame(intronsByTranscript(txdbid, use.names=TRUE))[,c(3:5,7,2)]
         }else if(featureid == 'cds'){
@@ -70,68 +64,63 @@ peakAnno <- function(GTF=GTF,organism=organism,up=2000,down=0,peaktype='m6A',bed
         }else if(featureid == '3utr'){
             getresult <- as.data.frame(threeUTRsByTranscript(txdbid, use.names=TRUE))[,c(3:5,7,2)]
         }else{
-            print("the feature id provided is not correct!")
+           message("the feature id provided is not correct!")
         }
-     getresult$type <- featureid
+     getresult$typeid <- featureid
      colnames(getresult)[5] <- 'tx_name'
      return(getresult)
     }
-    print("define other genomic features")
+    message("define other genomic features")
     Txfeature <- c('exon','intron','5utr','3utr','cds')
     for(i in 1:length(Txfeature)){
     genomicFeature <- rbind(genomicFeature,getfeature(txdb,Txfeature[i]))
     }
-    hg38_genomic_region <- left_join(genomicFeature, hg38_anno, by = c("tx_name" = "transcript_id"))
-    hg38_genomic_region <- na.omit(hg38_genomic_region)
-    hg38_genomic_region <- hg38_genomic_region[,-5]
-    hg38_genomic_region <- hg38_genomic_region %>% unite("metadata", strand:gene_name, remove = TRUE,sep = ":")
-    hg38_genomic_region <- GRanges(seqnames=hg38_genomic_region[,1],IRanges(start=hg38_genomic_region[,2],end=hg38_genomic_region[,3]),metadata=hg38_genomic_region[,4])
-    hg38_genomic_region <- unlist(reduce(split(hg38_genomic_region, hg38_genomic_region$metadata)))
-    a <- data.frame(X=names(hg38_genomic_region))
-    names(hg38_genomic_region) <- NULL
-    hg38_genomic_region <- as.data.frame(hg38_genomic_region)[,1:3]
-    metadata <- a %>% separate(X, c("strand","type","genetype","genename"),sep=":")
-    hg38_genomic_region <- cbind(hg38_genomic_region, metadata)
-    colnames(hg38_genomic_region)[1] <- c('chr')
-    #save(hg38_genomic_region,file="/data/bxhu/project/database/hg38/hg38_genomic_region.Rdata")
+    genomic_region <- left_join(genomicFeature, gene_anno, by = c("tx_name" = "transcript_id"))
+    genomic_region <- na.omit(genomic_region)
+    genomic_region <- genomic_region[,-5]
+    genomic_region <- genomic_region %>% unite("metadata", "strand":"gene_name", remove = TRUE,sep = ":")
+    genomic_region <- GRanges(seqnames=genomic_region[,1],IRanges(start=genomic_region[,2],end=genomic_region[,3]),metadata=genomic_region[,4])
+    genomic_region <- unlist(reduce(split(genomic_region, genomic_region$metadata)))
+    a <- data.frame(geneinfo=names(genomic_region))
+    names(genomic_region) <- NULL
+    genomic_region <- as.data.frame(genomic_region)[,1:3]
+    metadata <- a %>% separate("geneinfo", c("strand","typeid","genetype","genename"),sep=":")
+    genomic_region <- cbind(genomic_region, metadata)
+    colnames(genomic_region)[1] <- c('chr')
 
-    print("annotation is running")
-    #load("/data/bxhu/project/database/hg38/hg38_genomic_region.Rdata")
-
+    message("annotation is running")
     ####
     if(as.character(peaktype) =='m6A'){
-        hg38_genomic_region <- hg38_genomic_region[hg38_genomic_region$type != "intron",]
+        genomic_region <- genomic_region[genomic_region$typeid != "intron",]
     }else if(as.character(peaktype) %in% c('ChIP-seq','ATAC-seq','Cut&Tag')){
-        hg38_genomic_region <- hg38_genomic_region
+        genomic_region <- genomic_region
     }else{
-      print("the peak type provided is not correct")
+      message("the peak type provided is not correct")
     }
 
-    annorange <- GRanges(seqnames=hg38_genomic_region[,1], IRanges(hg38_genomic_region[,2], hg38_genomic_region[,3]),strand=hg38_genomic_region[,4])
-    mcols(annorange) <- hg38_genomic_region[,c(4:7)]
+    annorange <- GRanges(seqnames=genomic_region[,1], IRanges(genomic_region[,2], genomic_region[,3]),strand=genomic_region[,4])
+    mcols(annorange) <- genomic_region[,c(4:7)]
     input <- read.table(bedfile,sep="\t",header=T)
     inputrange <- GRanges(seqnames=input[,1], IRanges(input[,2], input[,3]),strand=input[,4])
-    #mcols(inputrange) <- input[,c(4:ncol(input))]
-
     olap <- findOverlaps(inputrange, annorange)
     result <- inputrange[queryHits(olap)]
     mcols(result) <- cbind(mcols(result), mcols(annorange[subjectHits(olap)]))
     result <- as.data.frame(result)
 
-    PCG <- result[(result$genetype=="protein_coding") & (result$type != 'exon'),]
+    PCG <- result[(result$genetype=="protein_coding") & (result$typeid != 'exon'),]
     Non <- result[(result$genetype !="protein_coding"),]
     result <- rbind(PCG,Non)
     result <- unique((result)[,c(1:3,5,6:ncol(result))])
     colnames(result) <- c('chr_peak','start_peak','end_peak','strand_peak',
-                           'strand','type','genetype','genename')
+                           'strand','typeid','genetype','genename')
     result <- result %>% unite("flag", c('chr_peak','start_peak','end_peak','strand_peak',
                                          'strand','genetype','genename'), remove = TRUE,sep = ":")
-    result <- result %>% group_by(flag) %>% summarise(type=paste(type,collapse=';'))
+    result <- result %>% group_by("flag") %>% summarise(typeid=paste(typeid,collapse=';'))
     result <- as.data.frame(result)
-    df <- data.frame(X=result$flag)
-    metadata <- df %>% separate(X, c('chr_peak','start_peak','end_peak','strand_peak',
+    df <- data.frame(geneinfo=result$flag)
+    metadata <- df %>% separate("geneinfo", c('chr_peak','start_peak','end_peak','strand_peak',
                                      'strand','genetype','genename'),sep=":")
-    result <- data.frame(metadata,type=result$type)
+    result <- data.frame(metadata,typeid=result$typeid)
     write_xlsx(result, paste0(outpath,"/",outfile,"_anno.xlsx"))
-    print("annotation is done")
+    message("annotation is done")
 }
