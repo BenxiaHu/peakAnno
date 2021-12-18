@@ -1,11 +1,7 @@
-# !/usr/bin/env Rscript
-# December 12,2021
-# Version 0.1.0
-#
 #' @title peakAnno: a package annotating peaks from m6A-seq and ChIP-seq/ATAC-seq/Cut&Tag.
 #' @description  This function peakAnno() in the peakAnno package.
 #' @param GTF a GTF file used for peakAnno.
-#' @param organism peaks called from which species.
+#' @param organism peaks called from which species.  # organism 是否支持 bioconductor 的 Orgdb 对象？
 #' @param up the start position of gene promoter used for peakAnno.
 #' @param down the end position of gene promoter used for peakAnno.
 #' @param peaktype peaks must include chr,start,end, and strand (+/-/.) used for peakAnno.
@@ -15,22 +11,14 @@
 #' @usage peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile).
 #' @details peakAnno annotate peaks and return the genomic feature associated with peaks.
 #' @return A peak annotation file will be returned at default.
-#' @note GTF files are available https://www.gencodegenes.org/.
+#' @note GTF files are available https://www.gencodegenes.org/.  ## 这些 NOTE 都可以添加到参数的说明中去
 #' @note up: upstream of TSS; default=2000.
 #' @note down: downstream of TSS; default=0.
-#' @note peaktype: default=m6A.
+#' @note peaktype: default=m6A.  
 #' @note outpath: pathway of output file.
 #' @note outfile: output file name.
 #' @author Benxia Hu
 #' @return One file will be returned at default.
-#' @import utils
-#' @import data.table
-#' @import tidyr
-#' @import GenomicFeatures
-#' @import dplyr
-#' @import stats
-#' @import GenomicRanges
-#' @import writexl
 #' @examples
 #' # run the function
 #' # peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
@@ -38,15 +26,17 @@
 "peakAnno"
 options(warn=-1)
 peakAnno <- function(GTF=GTF,organism=organism,up=2000,down=0,peaktype='m6A',bedfile,outpath,outfile="m6A_anno") {
-    print("make an annotation file containing transcriptid,gene symbol and gene type.")
-    #gtf="/data/bxhu/project/database/hg38/gencode.v38.annotation.gtf"
+  
+    # 对参数进行处理，判断参数是否有效，并给出相应的信息
+    message("make an annotation file containing transcriptid,gene symbol and gene type.") # 使用 message() 来显示进度
+    #gtf="/data/bxhu/project/database/hg38/gencode.v38.annotation.gtf"  # 删掉这些无用的代码
     gtf <- as.character(GTF)
-    GTF <- fread(gtf,sep="\t",header=F)
+    GTF <- data.table::fread(gtf,sep="\t",header=F) # 软件包中函数的引用要使用完整（绝对）的函数路径
     GTF <- GTF[GTF$V3 == 'transcript',]
     df <- data.frame(V9=GTF[,9])
-    hg38_anno <- df %>% separate(V9, c(NA,"transcript_id","gene_type","gene_name",NA,NA,NA,NA,NA,NA,NA,NA),sep=";")
+    hg38_anno <- df %>% tidyr::separate(V9, c(NA,"transcript_id","gene_type","gene_name",NA,NA,NA,NA,NA,NA,NA,NA),sep=";") # 既然你还支持其它的物种，那变量名称需要改一下。
     df <- data.frame(X=hg38_anno[,3])
-    temp <- df %>% separate(X, c("A","gene_name"),sep='\\"')
+    temp <- df %>% separate("X", c("A","gene_name"),sep='\\"') # 不允许出现可被解释为变量的字符
     hg38_anno$gene_name <- temp[,2]
     df <- data.frame(X=hg38_anno[,2])
     temp <- df %>% separate(X, c("A","gene_type"),sep='\\"')
