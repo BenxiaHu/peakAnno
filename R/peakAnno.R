@@ -1,11 +1,7 @@
-# !/usr/bin/env Rscript
-# December 12,2021
-# Version 0.1.0
-#
 #' @title peakAnno: a package annotating peaks from m6A-seq and ChIP-seq/ATAC-seq/Cut&Tag.
 #' @description  This function peakAnno() in the peakAnno package.
 #' @param GTF a GTF file used for peakAnno.
-#' @param organism peaks called from which species.
+#' @param organism peaks called from which species.  # organism 是否支持 bioconductor 的 Orgdb 对象？
 #' @param up the start position of gene promoter used for peakAnno.
 #' @param down the end position of gene promoter used for peakAnno.
 #' @param peaktype peaks must include chr,start,end, and strand (+/-/.) used for peakAnno.
@@ -15,22 +11,14 @@
 #' @usage peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile).
 #' @details peakAnno annotate peaks and return the genomic feature associated with peaks.
 #' @return A peak annotation file will be returned at default.
-#' @note GTF files are available https://www.gencodegenes.org/.
+#' @note GTF files are available https://www.gencodegenes.org/.  ## 这些 NOTE 都可以添加到参数的说明中去
 #' @note up: upstream of TSS; default=2000.
 #' @note down: downstream of TSS; default=0.
-#' @note peaktype: default=m6A.
+#' @note peaktype: default=m6A.  
 #' @note outpath: pathway of output file.
 #' @note outfile: output file name.
 #' @author Benxia Hu
 #' @return One file will be returned at default.
-#' @import utils
-#' @import data.table
-#' @import tidyr
-#' @import GenomicFeatures
-#' @import dplyr
-#' @import stats
-#' @import GenomicRanges
-#' @import writexl
 #' @examples
 #' # run the function
 #' # peakAnno(GTF,organism,up,down,peaktype,bedfile,outpath,outfile)
