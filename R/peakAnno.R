@@ -17,7 +17,7 @@
 #' @note peaktype: default=m6A.  
 #' @note outpath: pathway of output file.
 #' @note outfile: output file name.
-#' @author Benxia Hu
+#' @author Benxia Hu & Chunhui Gao
 #' @return One file will be returned at default.
 #' @examples
 #' # run the function
