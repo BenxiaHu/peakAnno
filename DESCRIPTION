@@ -2,10 +2,19 @@ Package: peakAnno
 Type: Package
 Title: peakAnno: a package annotating peaks from m6A-seq and ChIP-seq/ATAC-seq/Cut&Tag
 Version: 0.1.0
-Author: Benxia Hu
+Author: Benxia Hu & Chunhui Gao
 Maintainer: The package maintainer <hubenxia@gmail.com>
 Description: Annotate peaks.
-Imports:utils,GenomicFeatures,data.table,GenomicRanges,dplyr,stats,tidyr,writexl,utils
+Imports: 
+    utils,
+    GenomicFeatures,
+    data.table,
+    GenomicRanges,
+    dplyr,
+    stats,
+    tidyr,
+    writexl,
+    magrittr
 License: GPL
 Encoding: UTF-8
 LazyData: true
