@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Benxia Hu
 Maintainer: The package maintainer <hubenxia@gmail.com>
 Description: Annotate peaks.
-Imports:utils,GenomicFeatures,data.table,GenomicRanges,dplyr,stats,tidyr,writexl,utils
+Imports:utils,GenomicFeatures,data.table,GenomicRanges,dplyr,stats,tidyr,writexl
 License: GPL
 Encoding: UTF-8
 LazyData: true
