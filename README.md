@@ -44,7 +44,7 @@ default value is ‘m6A’.
 end and strand (+/-/.). It is better to provide the absolute path of the
 file.
 
-| chr  | start | end  | strand |
+##| chr  | start | end  | strand |
 |:----:|:-----:|:----:|:------:|
 | chr1 | 1000  | 1200 |   \+   |
 | chr1 | 1300  | 1500 |   \+   |
